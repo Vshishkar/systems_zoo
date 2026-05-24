@@ -58,6 +58,11 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("Enter messages to send (type 'exit' to quit):")
+
+	for _, message := range response.Messages {
+		fmt.Printf("%d: %s\n", message.AuthorId, message.Text)
+	}
+
 	for scanner.Scan() {
 		text := scanner.Text()
 		if text == "exit" {

@@ -23,6 +23,9 @@ func (s *Server) SendMessage(req SendMessageArgs, res *SendMessageResponse) erro
 }
 
 func (s *Server) RecordMessage(req SendMessageArgs) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	message := Message{
 		id:        len(s.messages) + 1,
 		text:      req.Text,

@@ -11,11 +11,22 @@ type RegisterClientArgs struct {
 	Port int
 }
 
+type MessageDto struct {
+	Id        int
+	Text      string
+	Timestamp time.Time
+	AuthorId  int
+}
+
 type RegisterClientResponse struct {
-	Id int
+	Messages []MessageDto
+	Id       int
 }
 
 func (s *Server) RegisterClient(req RegisterClientArgs, res *RegisterClientResponse) error {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	var clientId int
 	if req.Id == nil {
 		s.clientMaxId++
@@ -31,6 +42,15 @@ func (s *Server) RegisterClient(req RegisterClientArgs, res *RegisterClientRespo
 
 	log.Printf("Registered client %d on port %d", clientId, req.Port)
 	res.Id = clientId
+	res.Messages = make([]MessageDto, len(s.messages))
+	for i, msg := range s.messages {
+		res.Messages[i] = MessageDto{
+			Id:        msg.id,
+			Text:      msg.text,
+			Timestamp: msg.timestamp,
+			AuthorId:  msg.authorId,
+		}
+	}
 
 	go func() {
 		s.broadcastCh <- Message{

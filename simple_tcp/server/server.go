@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/rpc"
+	"sync"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type Server struct {
 	connections map[int]*rpc.Client
 	clientMaxId int
 	broadcastCh chan Message
+	lock        sync.RWMutex
 }
 
 type Client struct {
